@@ -1,0 +1,137 @@
+// File: package.json
+{
+  "name": "robo-derby-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
+
+// File: index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoboDerby Bracket</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+// File: src/main.jsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// File: src/App.jsx
+import React, { useState } from "react";
+
+const arenas = ["Sumo Arena", "Knock the Tower", "Robo Soccer"];
+
+const App = () => {
+  const [teams, setTeams] = useState([]);
+  const [teamInput, setTeamInput] = useState("");
+
+  const addTeam = () => {
+    if (teamInput.trim() && !teams.includes(teamInput.trim())) {
+      setTeams([...teams, teamInput.trim()]);
+      setTeamInput("");
+    }
+  };
+
+  const scheduleMatches = () => {
+    const matches = [];
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i + 1; j < teams.length; j++) {
+        matches.push({
+          teamA: teams[i],
+          teamB: teams[j],
+          arena: arenas[(i + j) % arenas.length],
+          scoreA: null,
+          scoreB: null,
+        });
+      }
+    }
+    return matches;
+  };
+
+  const matches = scheduleMatches();
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <h1 className="text-3xl font-bold mb-4">🤖 RoboDerby Bracket App</h1>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Enter team name"
+          value={teamInput}
+          onChange={(e) => setTeamInput(e.target.value)}
+          className="text-black px-2 py-1 mr-2"
+        />
+        <button
+          onClick={addTeam}
+          className="bg-blue-600 px-4 py-1 rounded hover:bg-blue-500"
+        >
+          Add Team
+        </button>
+      </div>
+      <ul className="mb-6">
+        {teams.map((team, idx) => (
+          <li key={idx} className="mb-1">• {team}</li>
+        ))}
+      </ul>
+
+      <h2 className="text-xl font-semibold mb-2">Scheduled Matches</h2>
+      <table className="w-full text-left border-collapse">
+        <thead>
+          <tr>
+            <th className="border-b pb-2">Team A</th>
+            <th className="border-b pb-2">Team B</th>
+            <th className="border-b pb-2">Arena</th>
+          </tr>
+        </thead>
+        <tbody>
+          {matches.map((match, index) => (
+            <tr key={index} className="border-t">
+              <td className="py-2">{match.teamA}</td>
+              <td>{match.teamB}</td>
+              <td>{match.arena}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default App;
+
+// File: src/index.css
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+input, button {
+  outline: none;
+}
